@@ -16,15 +16,25 @@ Não se trata de um sistema autônomo de decisão. O objetivo é investigar quai
 
 ## Dados
 
-Corte extraído do **MIMIC-IV 3.1**, contendo internações com diagnóstico de insuficiência cardíaca (CID-9 428.x, CID-10 I50.x) e passagem registrada por UTI. A janela de observação vai da entrada na UTI até 24 horas depois, e o desfecho é a mortalidade hospitalar.
+Corte extraído do **MIMIC-IV 3.1**, contendo internações com diagnóstico de insuficiência cardíaca (CID-9 428.x, CID-10 I50.x) e passagem registrada por UTI. A janela de observação vai da entrada na UTI até 24 horas depois, e o desfecho é a mortalidade hospitalar. A unidade de análise é a internação, não o paciente: cada internação tem sua própria janela e seu próprio desfecho.
 
-Três classes de dado compõem a janela:
+A extração identificou **22.629 internações elegíveis**; o material de trabalho é uma **amostra aleatória de 1.000**, sorteada com semente fixa. A amostragem é aleatória simples, não balanceada por desfecho — num estudo prognóstico, a prevalência é parte do que se quer medir.
 
-| Fonte | Conteúdo |
-|---|---|
-| Exames laboratoriais | Painel de 50 exames, com hora de cada coleta |
-| Sinais vitais | Pressão arterial, frequência cardíaca e respiratória, saturação, temperatura |
-| Escala de Coma de Glasgow | Componentes ocular, verbal e motor, e o total |
+| Característica | Amostra (n = 1.000) | Coorte completa (n = 22.629) |
+|---|---|---|
+| Óbitos hospitalares | 165 (16,5%) | 14,8% |
+| Idade mediana | 74 anos (27–98) | 74 anos |
+| Sexo | 546 M / 454 F (45,4% mulheres) | 45,0% mulheres |
+
+Três classes de dado compõem a janela, todas com o horário real de cada medição:
+
+| Fonte | Conteúdo | Volume na amostra |
+|---|---|---|
+| Exames laboratoriais | Painel de 50 exames, com hora de cada coleta | 73.182 medições |
+| Sinais vitais | Pressão arterial, frequência cardíaca e respiratória, saturação, temperatura | 165.667 registros |
+| Escala de Coma de Glasgow | Componentes ocular, verbal e motor, e o total | 5.654 avaliações completas |
+
+Cada internação é um diretório em `data/cohort/cases/` (`case_0001` … `case_1000`), com os dados clínicos e demográficos em JSON e as séries de exames, sinais vitais e Glasgow em CSV. A mediana da primeira coleta laboratorial ocorre 1,6 hora após a entrada na UTI, e nenhuma medição retida cai fora da janela de 0 a 24 horas.
 
 **Os dados não são distribuídos neste repositório.** O MIMIC-IV é um recurso credenciado sob a *Data Use Agreement* do PhysioNet: o acesso exige treinamento em pesquisa com seres humanos (CITI) e aprovação individual. Para reproduzir as análises, obtenha o acesso em [physionet.org](https://physionet.org/content/mimiciv/).
 
