@@ -28,9 +28,13 @@ Três classes de dado compõem a janela:
 
 **Os dados não são distribuídos neste repositório.** O MIMIC-IV é um recurso credenciado sob a *Data Use Agreement* do PhysioNet: o acesso exige treinamento em pesquisa com seres humanos (CITI) e aprovação individual. Para reproduzir as análises, obtenha o acesso em [physionet.org](https://physionet.org/content/mimiciv/).
 
-## Notebook
+## Notebooks
 
-`notebooks/01_data_exploration.ipynb` é o notebook de exploração da primeira etapa do projeto, e cobre:
+A primeira etapa do projeto é composta por dois notebooks.
+
+`notebooks/00_clinical_case.ipynb` parte do caso clínico que motiva o projeto — um paciente de 72 anos com insuficiência cardíaca descompensada — e o procura dentro dos dados: situa a idade do caso na coorte e acompanha, hora a hora, duas internações reais de perfil quase idêntico na chegada e desfechos opostos. É uma ilustração do problema, não evidência: mostra nos sinais vitais, nos exames seriados e na escala de Glasgow por que o valor de admissão isolado não basta.
+
+`notebooks/01_data_exploration.ipynb` responde à pergunta que o caso deixa — essas diferenças precoces se repetem de forma sistemática? — explorando a coorte inteira, e cobre:
 
 - caracterização da coorte
 - dicionário dos dados disponíveis
@@ -40,7 +44,7 @@ Três classes de dado compõem a janela:
 - seleção e fundamentação dos biomarcadores candidatos
 - definição preliminar da operacionalização computacional
 
-O notebook é autossuficiente: lê o corte diretamente do disco e usa apenas pandas, NumPy, Matplotlib e Seaborn. A análise desta etapa é **descritiva por escolha metodológica** — testes de hipótese pertencem à etapa seguinte, e selecionar candidatos depois de ver o resultado dos testes seria circular.
+Os dois notebooks são autossuficientes: leem o corte diretamente do disco e usam apenas pandas, NumPy, Matplotlib e Seaborn. A análise desta etapa é **descritiva por escolha metodológica** — testes de hipótese pertencem à etapa seguinte, e selecionar candidatos depois de ver o resultado dos testes seria circular.
 
 Cada figura é acompanhada de uma célula de interpretação.
 
