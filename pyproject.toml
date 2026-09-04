@@ -1,0 +1,34 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+# black formata células de notebook nativamente (extra `jupyter`)
+include = '\.pyi?$|\.ipynb$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# ruff lê notebooks nativamente desde a 0.6.0
+extend-exclude = ["data", "reports", "docs"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort — ordenação de imports
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "PD",  # pandas-vet
+]
+ignore = [
+    "E501",   # comprimento de linha é responsabilidade do black
+    "PD010",  # `.pivot` é intencional: `.pivot_table` agregaria duplicatas em silêncio
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Notebooks: imports fora do topo e expressões soltas na última linha são idiomáticos
+"*.ipynb" = ["E402", "B018"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["cardiofusion"]

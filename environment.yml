@@ -1,0 +1,19 @@
+name: cardiofusion
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  # análise
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - missingno
+  - scipy
+  - scikit-learn
+  - statsmodels  # regressão logística com inferência (IC, teste da razão de verossimilhança)
+  - jupyter
+  # qualidade de código
+  - black
+  - ruff
+  - tokenize-rt  # suporte do black a células .ipynb

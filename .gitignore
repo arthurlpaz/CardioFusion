@@ -1,0 +1,70 @@
+# ---------------------------------------------------------------
+# Dados clínicos — MIMIC-IV é dado credenciado (DUA do PhysioNet).
+# NADA em data/ pode ser versionado, em nenhuma hipótese.
+# Âncora "/data/" ao raiz: sem a barra inicial, o padrão também
+# bloquearia qualquer subpasta chamada "data" em outro lugar do
+# repositório (ex.: src/cardiofusion/data/), que é código, não dado.
+# ---------------------------------------------------------------
+/data/
+*.csv
+*.parquet
+*.dcm
+
+# ---------------------------------------------------------------
+# Conteúdo ainda não liberado para publicação.
+# Revisar caso a caso antes de remover destas linhas.
+# Também ancorado ao raiz, pelo mesmo motivo acima.
+# ---------------------------------------------------------------
+/docs/
+/reports/
+/references/
+*.pdf
+*.docx
+*.pptx
+
+# ---------------------------------------------------------------
+# Notas de sessão / plugins de agente — nunca vão para o repo
+# ---------------------------------------------------------------
+.remember/
+.claude/
+.superpowers/
+AGENTS.md
+CLAUDE.md
+*.local.md
+
+# ---------------------------------------------------------------
+# Anotações pessoais de como o código funciona — não é entregável
+# ---------------------------------------------------------------
+/code-notes/
+
+# ---------------------------------------------------------------
+# Python / Jupyter
+# ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+
+# ---------------------------------------------------------------
+# Sistema / editores
+# ---------------------------------------------------------------
+.vscode/
+.DS_Store
+.~lock.*#
+*~
+
+# ---------------------------------------------------------------
+# Explicações pessoais dos resultados — material de estudo, não entregável
+# ---------------------------------------------------------------
+/explanations/
+
+# ---------------------------------------------------------------
+# Trabalho em andamento, mantido local até estar pronto para publicar
+# ---------------------------------------------------------------
+/src/
+/notebooks/02_computational_evidence.ipynb
+/notebooks/03_validation_and_interpretation.ipynb
+/notebooks/04_final_model.ipynb
+/notebooks/05_biomarker_visualizations.ipynb
