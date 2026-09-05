@@ -5,7 +5,21 @@
 # bloquearia qualquer subpasta chamada "data" em outro lugar do
 # repositório (ex.: src/cardiofusion/data/), que é código, não dado.
 # ---------------------------------------------------------------
-/data/
+# Ignora TODO o conteúdo de data/, mas preserva a estrutura de pastas no
+# repositório através dos .gitkeep. A regra é sobre o conteúdo (`/data/*`) e
+# não sobre o diretório (`/data/`): o git não permite reincluir um arquivo se
+# o diretório-pai está excluído, então excluir `/data/` bloquearia até os
+# .gitkeep.
+/data/*
+!/data/.gitkeep
+!/data/README.md
+!/data/*/
+/data/*/*
+!/data/*/.gitkeep
+!/data/*/*/
+/data/*/*/*
+!/data/*/*/.gitkeep
+
 *.csv
 *.parquet
 *.dcm
