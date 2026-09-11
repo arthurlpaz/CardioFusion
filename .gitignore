@@ -78,7 +78,6 @@ venv/
 # Trabalho em andamento, mantido local até estar pronto para publicar
 # ---------------------------------------------------------------
 /src/
-/notebooks/02_computational_evidence.ipynb
 /notebooks/03_validation_and_interpretation.ipynb
 /notebooks/04_final_model.ipynb
 /notebooks/05_biomarker_visualizations.ipynb
