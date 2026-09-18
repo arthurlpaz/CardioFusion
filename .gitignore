@@ -25,6 +25,16 @@
 *.dcm
 
 # ---------------------------------------------------------------
+# Artefatos de modelo — saída, não entrada, e por isso fora de data/.
+# São regeneráveis por `cardiofusion-train`, e o .joblib é um pickle
+# binário preso à versão do scikit-learn que o gerou. O repositório
+# guarda a receita; o resultado se refaz em um comando.
+# ---------------------------------------------------------------
+/models/*
+!/models/.gitkeep
+!/models/README.md
+
+# ---------------------------------------------------------------
 # Conteúdo ainda não liberado para publicação.
 # Revisar caso a caso antes de remover destas linhas.
 # Também ancorado ao raiz, pelo mesmo motivo acima.
@@ -42,6 +52,8 @@
 .remember/
 .claude/
 .superpowers/
+.agents/
+skills-lock.json
 AGENTS.md
 CLAUDE.md
 *.local.md
@@ -60,6 +72,13 @@ __pycache__/
 .venv/
 venv/
 .env
+# metadados gerados por `pip install -e .` — build, não fonte
+*.egg-info/
+build/
+dist/
+# caches de ferramenta
+.pytest_cache/
+.ruff_cache/
 
 # ---------------------------------------------------------------
 # Sistema / editores
@@ -77,7 +96,4 @@ venv/
 # ---------------------------------------------------------------
 # Trabalho em andamento, mantido local até estar pronto para publicar
 # ---------------------------------------------------------------
-/src/
-/notebooks/03_validation_and_interpretation.ipynb
-/notebooks/04_final_model.ipynb
-/notebooks/05_biomarker_visualizations.ipynb
+/notes/
