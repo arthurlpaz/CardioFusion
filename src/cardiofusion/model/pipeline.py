@@ -6,7 +6,7 @@ ajusta; em `training`, como ele é ajustado e avaliado.
 Regressão logística, e não um método mais flexível, não por conveniência: a
 pergunta do projeto é quanto cada candidato acrescenta, e isso exige um
 coeficiente por variável. Com 151 eventos, um método flexível raramente supera
-um modelo linear bem especificado — o notebook 03 verificou isso contra gradient
+um modelo linear bem especificado — o notebook do modelo verificou isso contra gradient
 boosting e árvore de decisão, e nenhum justificou a troca.
 
 A mesma escolha é o que torna `explain` exato: com as variáveis padronizadas, a
@@ -25,7 +25,7 @@ ESTIMATOR_STEP = "logisticregression"
 
 
 def build_pipeline() -> Pipeline:
-    """Padronização seguida de regressão logística — o mesmo do notebook 03."""
+    """Padronização seguida de regressão logística — o mesmo do notebook do modelo."""
     return make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))
 
 

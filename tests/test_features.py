@@ -91,7 +91,7 @@ def test_gcs_admissao_is_the_first_total_of_the_window():
 
 
 def test_admission_missing_a_predictor_is_dropped():
-    """Caso completo, como no notebook 03: sem Glasgow, a internação não entra."""
+    """Caso completo, como no notebook do modelo: sem Glasgow, a internação não entra."""
     cohort = make_cohort(
         paciente_id=["case_0001", "case_0002"], idade=[72.0, 80.0], **{OUTCOME: [False, True]}
     )

@@ -4,7 +4,7 @@ A saída do projeto é sempre uma probabilidade com um estrato, nunca uma decis�
 binária. Isso é restrição de desenho, não de estilo: o enunciado define que o
 objetivo não é um sistema autônomo de decisão.
 
-Os cortes são os mesmos da seção 5 do notebook 03 — percentis 50, 80 e 95 da
+Os cortes são os mesmos da seção 5 do notebook do modelo — percentis 50, 80 e 95 da
 distribuição de risco do conjunto de treino. A faixa diz onde o paciente cai
 *em relação à coorte*, em vez de aplicar um limiar arbitrário.
 

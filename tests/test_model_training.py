@@ -1,6 +1,6 @@
 """Testes do treino, do artefato, e a verificação de que a fonte mudou sem perder a coorte.
 
-O notebook 03 lê os mil diretórios de `data/cohort/cases/`; o pacote lê os
+O O notebook do modelo lê os mil diretórios de `data/cohort/cases/`; o pacote lê os
 parquets de `data/cohort/`. As duas leituras deveriam descrever a mesma coorte.
 "Deveria" não basta: os testes desta seção comparam os números.
 
@@ -24,7 +24,7 @@ pytestmark = pytest.mark.skipif(
     reason="corte do MIMIC-IV ausente em data/cohort/",
 )
 
-# valores impressos pelo notebooks/03_prognostic_model.ipynb
+# valores impressos pelo notebooks/prognostic_model.ipynb
 NOTEBOOK_N = 958
 NOTEBOOK_DEATHS = 151
 NOTEBOOK_COEFFICIENTS = {
