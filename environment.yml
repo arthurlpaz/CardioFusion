@@ -13,7 +13,35 @@ dependencies:
   - scikit-learn
   - statsmodels  # regressão logística com inferência (IC, teste da razão de verossimilhança)
   - jupyter
+  # camada de serviço do modelo
+  - joblib       # persistência do pipeline treinado
+  - fastapi
+  - uvicorn
+  - httpx        # a interface conversa com a API; o TestClient do FastAPI é um httpx.Client
+  # O pyarrow vem do conda, junto com a libarrow que ele usa. O streamlit (pelo pip,
+  # abaixo) depende dele; sem esta linha, o pip instala o próprio wheel por cima dos
+  # arquivos do conda, e a extensão do wheel passa a carregar a libarrow do conda —
+  # uma instalação misturada que um `pip uninstall` depois deixa quebrada.
+  # (O segfault da interface no rerun é outro problema, do pool mimalloc do Arrow:
+  # ver src/cardiofusion/app/runtime.py.)
+  - pyarrow
   # qualidade de código
   - black
   - ruff
   - tokenize-rt  # suporte do black a células .ipynb
+  - pytest
+  - pip
+  - pip:
+      # o streamlit do conda-forge trava numa versão de 2022 por conflito com
+      # protobuf 7.x e quebra na importação; pelo pip a versão atual funciona
+      - streamlit
+      # o TestClient do starlette pede httpx2; sem ele o pytest emite warning
+      - httpx2
+
+variables:
+  # O libarrow do conda-forge usa o mimalloc como pool de memória padrão, e com ele
+  # a interface Streamlit cai com segmentation fault no primeiro rerun (cada clique
+  # reexecuta o script numa thread nova). Precisa ser escolhido na partida do
+  # processo — trocar depois, com pa.set_memory_pool, não basta. Aplicado ao ativar
+  # o ambiente; `tests/test_ui_runtime.py` cobra.
+  ARROW_DEFAULT_MEMORY_POOL: system
