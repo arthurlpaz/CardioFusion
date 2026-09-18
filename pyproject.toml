@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 
 [project.scripts]
 cardiofusion-train = "cardiofusion.model.training:main"
+cardiofusion-validate = "cardiofusion.model.validation:main"
 cardiofusion-extract = "cardiofusion.data.extract_mimic:main"
 cardiofusion-extract-vitals = "cardiofusion.data.extract_vitals:main"
 cardiofusion-sample = "cardiofusion.data.sample_cohort:main"

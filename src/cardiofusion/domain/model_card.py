@@ -13,6 +13,8 @@ nome do dado, não um identificador que traduzimos.
 
 from dataclasses import dataclass, field
 
+VALIDATION_KEY = "validacao_externa"
+
 
 @dataclass(frozen=True)
 class ModelMetrics:
@@ -37,6 +39,98 @@ class BandThresholds:
 
 
 @dataclass(frozen=True)
+class BandOutcome:
+    """O que aconteceu, na validação, com quem caiu numa faixa de risco.
+
+    A faixa é definida por limiares aprendidos no treino. Se ela transporta,
+    a fração da amostra em cada faixa se aproxima do desenho (50%, 30%, 15%,
+    5%) e a mortalidade cresce de uma para a outra.
+    """
+
+    faixa: str
+    internacoes: int
+    mortalidade: float
+    fracao_amostra: float
+    fracao_obitos: float
+
+    def to_dict(self) -> dict:
+        return {
+            "faixa": self.faixa,
+            "internacoes": self.internacoes,
+            "mortalidade": self.mortalidade,
+            "fracao_amostra": self.fracao_amostra,
+            "fracao_obitos": self.fracao_obitos,
+        }
+
+
+@dataclass(frozen=True)
+class ExternalValidation:
+    """Desempenho medido em internações que o modelo nunca viu.
+
+    Distinta de `ModelMetrics`, que vem do conjunto de teste separado dentro da
+    mesma amostra de desenvolvimento. A diferença entre as duas é o otimismo que
+    um teste interno não consegue medir.
+
+    `calibracao_inclinacao` abaixo de 1 significa previsões esticadas para as
+    pontas: a ordenação continua boa e as probabilidades exageram nos extremos.
+    """
+
+    n: int
+    n_eventos: int
+    roc_auc: float
+    ic_95: tuple[float, float]
+    brier: float
+    brier_ingenuo: float
+    calibracao_inclinacao: float
+    calibracao_intercepto: float
+    risco_medio_previsto: float
+    mortalidade_observada: float
+    faixas: tuple[BandOutcome, ...]
+    fonte: str
+    validado_em: str
+
+    @property
+    def bem_calibrado(self) -> bool:
+        """Inclinação entre 0,9 e 1,1 — a folga usual para dizer que não exagera."""
+        return 0.9 <= self.calibracao_inclinacao <= 1.1
+
+    def to_dict(self) -> dict:
+        return {
+            "n": self.n,
+            "n_eventos": self.n_eventos,
+            "roc_auc": self.roc_auc,
+            "ic_95": list(self.ic_95),
+            "brier": self.brier,
+            "brier_ingenuo": self.brier_ingenuo,
+            "calibracao_inclinacao": self.calibracao_inclinacao,
+            "calibracao_intercepto": self.calibracao_intercepto,
+            "risco_medio_previsto": self.risco_medio_previsto,
+            "mortalidade_observada": self.mortalidade_observada,
+            "faixas": [f.to_dict() for f in self.faixas],
+            "fonte": self.fonte,
+            "validado_em": self.validado_em,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ExternalValidation":
+        return cls(
+            n=data["n"],
+            n_eventos=data["n_eventos"],
+            roc_auc=data["roc_auc"],
+            ic_95=(data["ic_95"][0], data["ic_95"][1]),
+            brier=data["brier"],
+            brier_ingenuo=data["brier_ingenuo"],
+            calibracao_inclinacao=data["calibracao_inclinacao"],
+            calibracao_intercepto=data["calibracao_intercepto"],
+            risco_medio_previsto=data["risco_medio_previsto"],
+            mortalidade_observada=data["mortalidade_observada"],
+            faixas=tuple(BandOutcome(**f) for f in data["faixas"]),
+            fonte=data["fonte"],
+            validado_em=data["validado_em"],
+        )
+
+
+@dataclass(frozen=True)
 class ModelCard:
     """Metadados do modelo treinado, legíveis sem consultar o código."""
 
@@ -56,6 +150,12 @@ class ModelCard:
     # campos que versões futuras acrescentem chegam aqui em vez de quebrar a
     # leitura: acrescentar ao cartão não pode derrubar um cliente antigo
     extras: dict = field(default_factory=dict)
+
+    @property
+    def validacao_externa(self) -> ExternalValidation | None:
+        """A validação externa, se o cartão a carrega. `None` num cartão só treinado."""
+        bruto = self.extras.get(VALIDATION_KEY)
+        return ExternalValidation.from_dict(bruto) if bruto else None
 
     @property
     def prevalencia(self) -> float:

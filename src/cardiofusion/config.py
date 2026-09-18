@@ -28,6 +28,7 @@ DATA_DIR = Path(os.environ.get("CARDIOFUSION_DATA_DIR", PROJECT_ROOT / "data"))
 
 COHORT_DIR = DATA_DIR / "cohort"  # amostra de trabalho: 1.000 internações
 COHORT_FULL_DIR = DATA_DIR / "cohort_full"  # coorte completa, para reamostrar
+VALIDATION_DIR = DATA_DIR / "cohort_validation"  # internações nunca usadas, para validar
 CASES_DIR = COHORT_DIR / "cases"  # um diretório por internação
 MIMIC_SOURCE_DIR = DATA_DIR / "mimic_source"  # arquivos brutos do PhysioNet
 

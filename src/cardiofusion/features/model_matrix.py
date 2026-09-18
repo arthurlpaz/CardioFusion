@@ -1,6 +1,6 @@
 """Matriz do modelo prognóstico: os seis preditores fixados pela Entrega 2.
 
-Reproduz a construção do `notebooks/03_prognostic_model.ipynb`, mas lendo os
+Reproduz a construção do `notebooks/prognostic_model.ipynb`, mas lendo os
 parquets de `data/cohort/` em vez dos mil diretórios de `data/cohort/cases/`.
 É a mesma coorte por outra porta de entrada — e a igualdade entre as duas é
 verificada em `tests/test_model_training.py`, não assumida.
@@ -17,6 +17,7 @@ from cardiofusion.data.loaders import (
     load_cohort_mimic,
     load_gcs_timeseries_mimic,
     load_labs_wide_mimic,
+    load_validation_frames,
     load_vitals_timeseries_mimic,
 )
 from cardiofusion.domain.vocabulary import OUTCOME
@@ -46,7 +47,7 @@ def assemble_model_matrix(
     torna testável com frames de três linhas. Quem carrega é `build_model_matrix`.
 
     Devolve uma linha por internação, indexada por `paciente_id`, restrita aos
-    casos completos — a mesma decisão do notebook 03.
+    casos completos — a mesma decisão do notebook do modelo.
     """
     indexed = cohort.set_index("paciente_id")
 
@@ -55,7 +56,7 @@ def assemble_model_matrix(
     X["gcs_admissao"] = _first_reading(gcs, "GCS total")
     X["RDW"] = labs_wide["RDW"]
     X["Anion Gap"] = labs_wide["Anion Gap"]
-    # escala logarítmica, como no notebook 03. A Entrega 2 só testou a ureia bruta
+    # escala logarítmica, como no notebook do modelo. A Entrega 2 só testou a ureia bruta
     # (ΔAUC +0,037); dentro destes seis preditores, log e bruta são indistinguíveis
     X["log_urea"] = np.log1p(labs_wide["Urea Nitrogen"].clip(lower=0))
     X["Systolic BP"] = _first_reading(vitals[vitals.sinal == "Systolic BP"], "valor")
@@ -72,3 +73,13 @@ def build_model_matrix() -> pd.DataFrame:
         load_vitals_timeseries_mimic(),
         load_gcs_timeseries_mimic(),
     )
+
+
+def build_validation_matrix() -> pd.DataFrame:
+    """Matriz da amostra de validação: as internações elegíveis que ninguém usou.
+
+    Mesma função de montagem da matriz de treino, de propósito. Se as duas
+    fossem construídas por caminhos diferentes, qualquer divergência apareceria
+    como queda de desempenho e seria lida como falha do modelo.
+    """
+    return assemble_model_matrix(*load_validation_frames())

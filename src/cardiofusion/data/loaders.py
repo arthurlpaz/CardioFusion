@@ -18,7 +18,7 @@ Uso típico:
 
 import pandas as pd
 
-from cardiofusion.config import COHORT_DIR
+from cardiofusion.config import COHORT_DIR, COHORT_FULL_DIR, VALIDATION_DIR
 
 
 def _mimic_labels() -> pd.Series:
@@ -101,3 +101,47 @@ def load_labs_dynamic_mimic() -> pd.DataFrame:
     dyn = pd.read_parquet(COHORT_DIR / "labs_dynamic.parquet")
     dyn.insert(0, "paciente_id", dyn.hadm_id.map(_mimic_labels()))
     return dyn.drop(columns="hadm_id")
+
+
+# ---------------------------------------------------------------- validação externa
+# A coorte de validação são as internações elegíveis que nenhuma etapa do projeto
+# usou: nem as 1.000 de desenvolvimento, nem qualquer internação dos mesmos
+# pacientes. Os exames vêm de `cohort_full`, onde estão os de todas as elegíveis;
+# sinais vitais e Glasgow foram extraídos à parte, para esta validação.
+
+
+def _validation_labels() -> pd.Series:
+    """Mapa hadm_id -> rótulo sequencial local (`val_00001`, ...)."""
+    hadm = pd.read_parquet(VALIDATION_DIR / "cohort.parquet", columns=["hadm_id"]).hadm_id
+    hadm = hadm.sort_values().reset_index(drop=True)
+    return pd.Series([f"val_{i:05d}" for i in range(1, len(hadm) + 1)], index=hadm)
+
+
+def load_validation_frames() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Coorte, exames, sinais vitais e Glasgow da amostra de validação.
+
+    Devolve na ordem que `assemble_model_matrix` espera, para que a matriz de
+    validação seja montada pela mesma função que monta a de treino. Se as duas
+    fossem construídas por caminhos diferentes, qualquer divergência apareceria
+    como queda de desempenho e seria lida como falha do modelo.
+    """
+    rotulos = _validation_labels()
+
+    cohort = pd.read_parquet(VALIDATION_DIR / "cohort.parquet").sort_values("hadm_id")
+    cohort.insert(0, "paciente_id", cohort.hadm_id.map(rotulos))
+    cohort = cohort.drop(columns="hadm_id").reset_index(drop=True)
+
+    labs = pd.read_parquet(COHORT_FULL_DIR / "labs_wide.parquet")
+    labs = labs[labs.index.isin(rotulos.index)]
+    labs.index = labs.index.map(rotulos)
+    labs.index.name = "paciente_id"
+
+    vitals = pd.read_parquet(VALIDATION_DIR / "vitals_timeseries.parquet")
+    vitals.insert(0, "paciente_id", vitals.hadm_id.map(rotulos))
+    vitals = vitals.drop(columns="hadm_id")
+
+    gcs = pd.read_parquet(VALIDATION_DIR / "gcs_timeseries.parquet")
+    gcs.insert(0, "paciente_id", gcs.hadm_id.map(rotulos))
+    gcs = gcs.drop(columns="hadm_id")
+
+    return cohort, labs.sort_index(), vitals, gcs
