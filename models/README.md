@@ -5,12 +5,15 @@ e não é versionado.
 
 ```bash
 cardiofusion-train          # ou: python -m cardiofusion.model.training
+cardiofusion-validate       # mede o artefato fora da amostra e anota no cartão
 ```
 
 | Arquivo | O que é |
 |---|---|
 | `model.joblib` | o pipeline treinado (`StandardScaler` + `LogisticRegression`) |
 | `model_card.json` | preditores, métricas, tamanho da amostra, coeficientes, semente e data do treino |
+
+O `cardiofusion-validate` acrescenta ao cartão a chave `validacao_externa`: desempenho, calibração e mortalidade por faixa nas internações elegíveis que nenhuma etapa do projeto usou. É um acréscimo, não uma reescrita — quem lê o cartão sem essa chave continua funcionando, e a API publica o bloco quando ele existe.
 
 Por que aqui e não em `data/`: `data/` guarda a **entrada** do projeto — o corte
 credenciado do MIMIC-IV, que não se regenera e não sai do disco de quem tem

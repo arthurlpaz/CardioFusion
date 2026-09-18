@@ -103,6 +103,19 @@ A saída reporta **ROC AUC**, **acurácia** e a **acurácia de quem prevê sempr
 
 > Esta etapa exige os dados credenciados. Sem `data/cohort/`, não há o que treinar — veja a seção **Dados**.
 
+### Validação externa do artefato
+
+```bash
+cardiofusion-validate
+# equivalente: python -m cardiofusion.model.validation
+```
+
+Mede o modelo já treinado nas internações elegíveis do MIMIC-IV que nenhuma etapa do projeto usou: 19.848 casos completos, depois de excluir as 1.000 da amostra de desenvolvimento e as 1.010 internações de pacientes que aparecem nela. Grava o resultado no `model_card.json`, sob a chave `validacao_externa`, de onde a API e a interface o leem.
+
+O que ficou registrado: **AUC de 0,721** com intervalo de 95% entre 0,710 e 0,731, contra 0,732 no teste interno; **inclinação de calibração de 0,705**; e, para cada faixa de risco, a mortalidade observada. A leitura está na seção 4.6 do relatório da Entrega 3 — o modelo **ordena bem e anuncia mal**, e é por isso que a interface mostra a mortalidade observada de cada faixa e uma ressalva ao lado do número individual.
+
+> Esta etapa também exige os dados credenciados e, além do corte de desenvolvimento, precisa de `data/cohort_validation/`.
+
 ### 2. Subir a API
 
 ```bash
@@ -164,7 +177,7 @@ streamlit run src/cardiofusion/app/streamlit_app.py
 
 Disponível em `http://localhost:8501`. Um formulário com as seis variáveis, já preenchido com o perfil do caso clínico do enunciado, devolve o risco estimado e o estrato na coorte.
 
-Abaixo de cada campo aparece o menor e o maior valor que o modelo aceita — os mesmos limites que a API usa para validar, lidos da mesma tabela do domínio. O **?** ao lado de cada campo explica o que a variável mede e em que direção ela move o risco no modelo treinado. A cada cálculo, a seção **Por que este risco** mostra uma cascata: começa no risco do paciente médio da coorte, cada variável deste paciente empurra o risco para cima ou para baixo, e termina no risco calculado. Mais abaixo, um gráfico mostra o peso de cada variável no modelo, com a versão em tabela logo embaixo.
+Abaixo de cada campo aparece o menor e o maior valor que o modelo aceita — os mesmos limites que a API usa para validar, lidos da mesma tabela do domínio. O **?** ao lado de cada campo explica o que a variável mede e em que direção ela move o risco no modelo treinado. A cada cálculo, a seção **Por que este risco** mostra uma cascata: começa no risco do paciente médio da coorte, cada variável deste paciente empurra o risco para cima ou para baixo, e termina no risco calculado. Mais abaixo, um gráfico mostra o peso de cada variável no modelo, com a versão em tabela logo embaixo. Quando o cartão do modelo traz a validação externa, a faixa vem acompanhada da mortalidade observada naquela faixa fora da amostra, e a seção **Como este modelo se saiu fora da amostra** reúne AUC, calibração e a tabela das quatro faixas.
 
 ### Variáveis de ambiente
 
