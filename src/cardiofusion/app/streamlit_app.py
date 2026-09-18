@@ -15,6 +15,12 @@ from cardiofusion.app.client import ApiUnavailable, CardioFusionClient, Observat
 from cardiofusion.app.explanation import explanation_summary, explanation_table
 from cardiofusion.app.form_fields import FIELDS, FieldSpec, help_text, weights_table
 from cardiofusion.app.runtime import ensure_safe_arrow_pool
+from cardiofusion.app.validation_view import (
+    band_evidence,
+    calibration_caveat,
+    validation_bands,
+    validation_summary,
+)
 from cardiofusion.domain.observation import PatientObservation
 
 # com o pool mimalloc do Arrow, o servidor cai no primeiro clique; a correção é a
@@ -149,6 +155,14 @@ if calcular:
             "O estrato compara este paciente com a distribuição de risco dos demais."
         )
 
+        evidence = band_evidence(model_card, estimativa.faixa)
+        if evidence is not None:
+            st.markdown(evidence)
+
+        caveat = calibration_caveat(model_card)
+        if caveat is not None:
+            st.warning(caveat)
+
     if estimativa.explicacao is not None:
         st.divider()
         st.markdown("### Por que este risco")
@@ -204,7 +218,7 @@ st.caption(
     "Barra para a direita: a variável eleva o risco; para a esquerda, reduz. O comprimento "
     "é o efeito de **um desvio-padrão a mais** na variável — por isso as seis são "
     "comparáveis entre si. São os pesos do modelo usado na predição, que é padronizado e "
-    "penalizado; não são os coeficientes com intervalo de confiança do notebook 03."
+    "penalizado; não são os coeficientes com intervalo de confiança do notebook do modelo."
 )
 
 with st.expander("Ver pesos e faixas aceitas em tabela"):
@@ -220,6 +234,47 @@ with st.expander("Ver pesos e faixas aceitas em tabela"):
             "efeito": st.column_config.TextColumn("Efeito"),
             "faixa_aceita": st.column_config.TextColumn("Faixa aceita pelo modelo"),
         },
+    )
+
+validation = model_card.validacao_externa
+if validation is not None:
+    st.divider()
+    st.markdown("### Como este modelo se saiu fora da amostra")
+    st.markdown(validation_summary(model_card))
+    v1, v2, v3 = st.columns(3)
+    v1.metric(
+        "ROC AUC na validação",
+        f"{validation.roc_auc:.3f}",
+        delta=f"{validation.roc_auc - model_card.metricas.roc_auc:+.3f} vs. teste interno",
+        delta_color="off",
+    )
+    v2.metric(
+        "Inclinação de calibração",
+        f"{validation.calibracao_inclinacao:.2f}",
+        help="1,00 seria perfeito",
+    )
+    v3.metric(
+        "Brier",
+        f"{validation.brier:.4f}",
+        delta=f"{validation.brier - validation.brier_ingenuo:+.4f} vs. repetir a prevalência",
+        delta_color="inverse",
+    )
+    st.dataframe(
+        validation_bands(model_card),
+        hide_index=True,
+        column_config={
+            "faixa": st.column_config.TextColumn("Faixa"),
+            "internacoes": st.column_config.NumberColumn("Internações", format="%d"),
+            "fracao_amostra": st.column_config.NumberColumn("% da amostra", format="percent"),
+            "mortalidade": st.column_config.NumberColumn("Mortalidade observada", format="percent"),
+            "fracao_obitos": st.column_config.NumberColumn("% dos óbitos", format="percent"),
+        },
+    )
+    st.caption(
+        "As faixas são definidas por limiares aprendidos no treino. Elas transportam: a "
+        "proporção da amostra em cada uma fica perto do desenho (50%, 30%, 15% e 5%) e a "
+        f"mortalidade cresce de uma para a outra. Fonte: {validation.fonte}. "
+        f"Validado em {validation.validado_em}."
     )
 
 with st.expander("Sobre o modelo"):
